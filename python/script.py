@@ -101,12 +101,10 @@ def main():
         source_ids = [line.strip() for line in f.readlines()]
 
     pool = eventlet.GreenPool(100)
-    green_threads = []
     for source_id in source_ids:
-        green_threads.append(pool.spawn(poll, pool, token, source_id))
+        pool.spawn(poll, pool, token, source_id)
 
-    results = [gt.wait() for gt in green_threads]
-    print results
+    pool.waitall()
 
 
 if __name__ == "__main__":
