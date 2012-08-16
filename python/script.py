@@ -14,7 +14,6 @@ conn = Connection(MONGO_HOST, MONGO_PORT,
 DB = getattr(conn, MONGO_DBNAME)
 POSTS, COMMENTS = DB.posts, DB.comments
 
-GRAPH = "https://graph.facebook.com"
 
 def init_db():
     POSTS.ensure_index('uid', unique=True)
@@ -41,13 +40,15 @@ class Comment(Model):
     ATTRS = ['uid', 'post_id', 'text']
 
 
-class MiniPoller(object):
-    def __init__(self, pool, token, source_id):
-        self.pool, self.token, self.source_id = pool, token, source_id
+class GraphClient(object):
+    HOST = "https://graph.facebook.com"
+
+    def __init__(self, token):
+        self.token = token
 
     def _graph_url(self, *path_bits, **query_params):
         path_bits = list(path_bits)
-        path_bits.insert(0, GRAPH)
+        path_bits.insert(0, self.HOST)
         query_params.update(access_token=self.token)
         return "/".join(path_bits) + "?" + urlencode(query_params.items())
 
@@ -56,12 +57,17 @@ class MiniPoller(object):
         resp = urllib2.urlopen(url)
         return json.loads(resp.read())['data']
 
+
+class PollingTask(object):
+    def __init__(self, pool, source_id, client):
+        self.pool, self.source_id, self.client = pool, source_id, client
+
     def go(self):
         for post in self.get_posts():
             self.pool.spawn(self.get_comments, post)
 
     def get_posts(self):
-        post_dicts = self.graph_call(self.source_id, 'posts')
+        post_dicts = self.client.graph_call(self.source_id, 'posts')
         posts = []
         for p in post_dicts:
             text = p['message'] if 'message' in p else p['story'] if 'story' in p else p['caption']
@@ -72,15 +78,15 @@ class MiniPoller(object):
         return posts
 
     def get_comments(self, post):
-        comment_dicts = self.graph_call(post.uid, 'comments')
+        comment_dicts = self.client.graph_call(post.uid, 'comments')
 
         for c in comment_dicts:
             comment = Comment(uid=c['id'], text=c['message'], post_id=post.uid)
             comment.save()
 
 
-def poll(pool, token, source_id):
-    MiniPoller(pool, token, source_id).go()
+def poll(pool, source_id, client):
+    PollingTask(pool, source_id, client).go()
 
 
 def main():
@@ -100,9 +106,11 @@ def main():
     with open('../files/source_ids.txt', 'r') as f:
         source_ids = [line.strip() for line in f.readlines()]
 
+    client = GraphClient(token)
+
     pool = eventlet.GreenPool(100)
     for source_id in source_ids:
-        pool.spawn(poll, pool, token, source_id)
+        pool.spawn(poll, pool, source_id, client)
 
     pool.waitall()
 
