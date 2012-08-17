@@ -8,16 +8,8 @@ import java.util.Set;
 
 public class SpeedTest {
 	
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
-	public static void main(String[] args) throws IOException {
-		String token = args[0];
-		System.out.println(token);
-		
-        BufferedReader reader = new BufferedReader(
-        		new FileReader("/home/glloyd/scratch/iospeedtest/files/source_ids.txt"));
+	private static Set<String> getSourceIds(String filename) throws IOException {
+        BufferedReader reader = new BufferedReader(new FileReader(filename));
         
         Set<String> sourceIds = new HashSet<String>();
         String sourceId = null;
@@ -25,7 +17,19 @@ public class SpeedTest {
 			sourceIds.add(sourceId);
 		}
 		
-        System.out.println(sourceIds);		
+		return sourceIds;
 	}
-
+	
+	public static void main(String[] args) throws Exception {
+		String token = args[0];
+		Set<String> sourceIds = getSourceIds("/home/glloyd/scratch/iospeedtest/files/source_ids.txt");
+		
+		GraphClient graphClient = null;
+		
+		graphClient = new GraphClient(token);			
+		for (String sourceId : sourceIds) {
+			new PollingTask(sourceId, graphClient).performTask();
+		}
+		graphClient.shutDownWhenFinished();
+	}
 }
