@@ -29,15 +29,17 @@ class Model(object):
 
     def save(self):
         doc = {k: getattr(self, k) for k in self.ATTRS}
-        POSTS.insert(doc, safe=INSERT_SAFELY)
+        self.COLLECTION.insert(doc, safe=INSERT_SAFELY)
 
 
 class Post(Model):
     ATTRS = ['uid', 'source_id', 'text']
+    COLLECTION = POSTS
 
 
 class Comment(Model):
     ATTRS = ['uid', 'post_id', 'text']
+    COLLECTION = COMMENTS
 
 
 class GraphClient(object):
