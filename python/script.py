@@ -76,7 +76,7 @@ class PollingTask(object):
         post_dicts = self.client.graph_call(self.source_id, 'posts')
         posts = []
         for p in post_dicts:
-            text = p['message'] if 'message' in p else p['story'] if 'story' in p else p['caption']
+            text = p.get('message', None)
             post = Post(uid=p['id'], text=text, source_id=self.source_id)
             post.save()
             posts.append(post)
