@@ -1,5 +1,6 @@
 package com.conversocial.iospeedtest;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -10,9 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.zip.GZIPInputStream;
 
 import javax.management.RuntimeErrorException;
 
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.concurrent.FutureCallback;
@@ -46,9 +49,18 @@ public class PollingTask {
 
 		public JSONObject getJsonResponse(HttpResponse response) {
 			HttpEntity body = response.getEntity();
+			boolean gzipResponse = false;
+			for (Header header : response.getHeaders("Content-encoding")) {
+				if (header.getValue().equals("gzip")) {
+					gzipResponse = true;
+				}
+			}
 			Reader reader = null;
 			try {
 				InputStream stream = body.getContent();
+				if (gzipResponse) {
+					stream = new GZIPInputStream(stream);
+				}
 				reader = new InputStreamReader(stream);
 			} catch (IllegalStateException e) {
 				throw new RuntimeException(e);
@@ -65,7 +77,7 @@ public class PollingTask {
 				throw new RuntimeException(e);
 			} catch (NoSuchElementException e) {
 				throw new RuntimeException(e);
-			}
+			} 
 			
 			if (responseObject.containsKey("error")) {
 				throw new RuntimeException("Facebook error");

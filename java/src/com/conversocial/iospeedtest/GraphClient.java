@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.conn.routing.HttpRoute;
@@ -44,14 +45,16 @@ public class GraphClient {
 		ConnectingIOReactor reactor = new DefaultConnectingIOReactor(config);
 		
 		manager = new PoolingClientAsyncConnectionManager(reactor);
-
 		manager.setMaxTotal(200);
 		manager.setDefaultMaxPerRoute(200);
 		
 		
 		this.httpclient = new DefaultHttpAsyncClient(manager);
+
 		this.httpclient.start();
 	}
+	
+	
 
 	/**
 	 * 
@@ -77,6 +80,7 @@ public class GraphClient {
 		String queryString = StringUtils.join(pairs, "&");
 		
         HttpGet request = new HttpGet(path + "?" + queryString);
+        request.addHeader("Accept-encoding", "gzip");
 
         return httpclient.execute(request, callback);
 	}
