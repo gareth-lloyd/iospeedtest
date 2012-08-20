@@ -51,7 +51,6 @@ public class DataStore {
 		doc.put("post", comment.getPost().getUid());
 		
 		comments.insert(doc);
-		System.out.println("saved comment");
 	}
 	
 	public void savePost(Post post) {
@@ -61,6 +60,11 @@ public class DataStore {
 		doc.put("sourceId", post.getSourceId());
 		
 		posts.insert(doc);
-		System.out.println("saved post");
+	}
+
+	public void printStats() {
+		System.out.println();
+		System.out.println("posts saved: " + Long.toString(posts.count()));
+		System.out.println("comments saved: " + Long.toString(comments.count()));
 	}
 }

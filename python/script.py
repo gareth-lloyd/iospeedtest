@@ -29,7 +29,6 @@ class Model(object):
             setattr(self, attr_name, kwargs.get(attr_name))
 
     def save(self):
-        print "saved something"
         doc = {k: getattr(self, k) for k in self.ATTRS}
         self.COLLECTION.insert(doc, safe=INSERT_SAFELY)
 
@@ -58,7 +57,8 @@ class GraphClient(object):
 
     def graph_call(self, *path_bits, **kwargs):
         url = self._graph_url(*path_bits, **kwargs)
-        resp = urllib2.urlopen(url, timeout=5)
+        resp = urllib2.urlopen(url, timeout=30)
+
         return json.loads(resp.read())['data']
 
 
@@ -112,11 +112,15 @@ def main():
 
     client = GraphClient(token)
 
-    pool = eventlet.GreenPool(50)
+    pool = eventlet.GreenPool(100)
     for source_id in source_ids:
         pool.spawn(poll, pool, source_id, client)
 
     pool.waitall()
+
+    print 
+    print "saved %d comments" % COMMENTS.count()
+    print "saved %d posts" % POSTS.count()
 
 
 if __name__ == "__main__":

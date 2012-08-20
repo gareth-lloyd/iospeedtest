@@ -31,5 +31,6 @@ public class SpeedTest {
 			new PollingTask(sourceId, graphClient).performTask();
 		}
 		graphClient.shutDownWhenFinished();
+		DataStore.getInstance().printStats();
 	}
 }

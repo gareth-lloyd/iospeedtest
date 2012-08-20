@@ -68,7 +68,6 @@ public class PollingTask {
 			}
 			
 			if (responseObject.containsKey("error")) {
-				System.out.println(responseObject);
 				throw new RuntimeException("Facebook error");
 			}
 			
@@ -80,8 +79,6 @@ public class PollingTask {
 			JSONObject responseObject = getJsonResponse(response);
 			JSONArray postsJson = (JSONArray) responseObject.get("data");
 			
-			System.out.println("Retrieved posts for " + sourceId);
-
 			for (Object postJson : postsJson) {
 				JSONObject postObject = (JSONObject) postJson;
 				String uid = (String) postObject.get("id");
@@ -111,7 +108,6 @@ public class PollingTask {
 		
 		@Override
 		public void completed(HttpResponse response) {
-			System.out.println("Retrieved comments for " + this.post.getUid());
 			
 			JSONObject responseObject = getJsonResponse(response);
 			JSONArray commentsJson = (JSONArray) responseObject.get("data");

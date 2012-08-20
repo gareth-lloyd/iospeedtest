@@ -83,7 +83,6 @@ public class GraphClient {
 		while (true) {
 			Thread.sleep(500);
 			PoolStats stats = manager.getTotalStats();
-			System.out.println(stats.getLeased());
 			if (0 == stats.getLeased()) {
 				break;
 			}
