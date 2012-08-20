@@ -47,6 +47,7 @@ public class DataStore {
 	}
 	
 	public void saveComment(Comment comment) {
+		if (true) return;
 		BasicDBObject doc = new BasicDBObject();
 		doc.put("uid", comment.getUid());
 		doc.put("message", comment.getMessage());
@@ -56,6 +57,7 @@ public class DataStore {
 	}
 	
 	public void savePost(Post post) {
+		if (true) return;
 		BasicDBObject doc = new BasicDBObject();
 		doc.put("uid", post.getUid());
 		doc.put("message", post.getMessage());
