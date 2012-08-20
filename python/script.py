@@ -2,10 +2,11 @@ import argparse, json, eventlet
 from eventlet.green import urllib2
 from urllib import urlencode
 
+import socket
 from pymongo import Connection
 
 MONGO_HOST, MONGO_PORT, MONGO_DBNAME = 'localhost', 27017, 'iotest'
-INSERT_SAFELY = False
+INSERT_SAFELY = True
 
 MONGO_MAX_CONNECTIONS = 1
 conn = Connection(MONGO_HOST, MONGO_PORT,
@@ -28,6 +29,7 @@ class Model(object):
             setattr(self, attr_name, kwargs.get(attr_name))
 
     def save(self):
+        print "saved something"
         doc = {k: getattr(self, k) for k in self.ATTRS}
         self.COLLECTION.insert(doc, safe=INSERT_SAFELY)
 
@@ -56,7 +58,7 @@ class GraphClient(object):
 
     def graph_call(self, *path_bits, **kwargs):
         url = self._graph_url(*path_bits, **kwargs)
-        resp = urllib2.urlopen(url)
+        resp = urllib2.urlopen(url, timeout=5)
         return json.loads(resp.read())['data']
 
 
@@ -110,7 +112,7 @@ def main():
 
     client = GraphClient(token)
 
-    pool = eventlet.GreenPool(100)
+    pool = eventlet.GreenPool(50)
     for source_id in source_ids:
         pool.spawn(poll, pool, source_id, client)
 

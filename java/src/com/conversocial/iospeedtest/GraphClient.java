@@ -37,8 +37,7 @@ public class GraphClient {
 		this.token = token;
 		
 		IOReactorConfig config = new IOReactorConfig();
-		config.setIoThreadCount(50);
-		config.setShutdownGracePeriod(30000);
+		config.setShutdownGracePeriod(3000);
 		config.setConnectTimeout(1000);
 		config.setSoTimeout(1000);
 		ConnectingIOReactor reactor = new DefaultConnectingIOReactor(config);
