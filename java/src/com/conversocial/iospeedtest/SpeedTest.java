@@ -22,7 +22,7 @@ public class SpeedTest {
 	
 	public static void main(String[] args) throws Exception {
 		String token = args[0];
-		Set<String> sourceIds = getSourceIds("/home/glloyd/scratch/iospeedtest/files/source_ids.txt");
+		Set<String> sourceIds = getSourceIds("files/source_ids.txt");
 		
 		GraphClient graphClient = null;
 		
