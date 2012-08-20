@@ -37,12 +37,14 @@ public class GraphClient {
 		this.token = token;
 		
 		IOReactorConfig config = new IOReactorConfig();
+		config.setIoThreadCount(4);
 		config.setShutdownGracePeriod(3000);
 		config.setConnectTimeout(1000);
 		config.setSoTimeout(1000);
 		ConnectingIOReactor reactor = new DefaultConnectingIOReactor(config);
 		
 		manager = new PoolingClientAsyncConnectionManager(reactor);
+
 		manager.setMaxTotal(200);
 		manager.setDefaultMaxPerRoute(200);
 		

@@ -1,7 +1,8 @@
-import argparse, json, eventlet, gzip
-from eventlet.green import urllib2
+import argparse, json, eventlet
+requests = eventlet.import_patched('requests')
 from urllib import urlencode
-from StringIO import StringIO
+
+requests.defaults.defaults['pool_maxsize'] = 100
 
 from pymongo import Connection
 
@@ -29,6 +30,7 @@ class Model(object):
             setattr(self, attr_name, kwargs.get(attr_name))
 
     def save(self):
+        print 'saveing'
         doc = {k: getattr(self, k) for k in self.ATTRS}
         self.COLLECTION.insert(doc, safe=INSERT_SAFELY)
 
@@ -48,7 +50,6 @@ class GraphClient(object):
 
     def __init__(self, token):
         self.token = token
-        self.opener = urllib2.build_opener()
 
     def _graph_url(self, *path_bits, **query_params):
         path_bits = list(path_bits)
@@ -58,17 +59,9 @@ class GraphClient(object):
 
     def graph_call(self, *path_bits, **kwargs):
         url = self._graph_url(*path_bits, **kwargs)
-
-        request = urllib2.Request(url)
-        request.add_header('Accept-encoding', 'gzip')
-        resp = self.opener.open(request)
-
-        if 'gzip' == resp.headers.get('Content-Encoding'):
-            response_data = gzip.GzipFile(fileobj=StringIO(resp.read())).read()
-        else:
-            response_data = resp.read()
-
-        return json.loads(response_data)['data']
+        headers = {'Accept-encoding': 'gzip'}
+        response = requests.get(url, headers=headers)
+        return json.loads(response.content)['data']
 
 
 class PollingTask(object):

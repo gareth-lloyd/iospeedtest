@@ -24,6 +24,8 @@ public class SpeedTest {
 		String token = args[0];
 		Set<String> sourceIds = getSourceIds("files/source_ids.txt");
 		
+		long start = System.currentTimeMillis();
+		
 		GraphClient graphClient = null;
 		
 		graphClient = new GraphClient(token);			
@@ -31,6 +33,10 @@ public class SpeedTest {
 			new PollingTask(sourceId, graphClient).performTask();
 		}
 		graphClient.shutDownWhenFinished();
+		
+		long end = System.currentTimeMillis();
+		
 		DataStore.getInstance().printStats();
+		System.out.println("took " + Long.toString((end - start) / 1000) + "s");
 	}
 }

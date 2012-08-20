@@ -8,6 +8,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
 import com.mongodb.DBCollection;
 import com.mongodb.Mongo;
+import com.mongodb.WriteConcern;
 
 public class DataStore {
 	private static DataStore instance = new DataStore();
@@ -22,6 +23,7 @@ public class DataStore {
 	private DataStore() {
 		try {
 			m = new Mongo();
+			m.setWriteConcern(WriteConcern.SAFE);
 		} catch (UnknownHostException e) {
 			throw new RuntimeException(e);
 		}
