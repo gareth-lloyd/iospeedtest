@@ -50,6 +50,7 @@ class GraphClient(object):
 
     def __init__(self, token):
         self.token = token
+        self.session = requests.session(headers={'Accept-encoding': 'gzip'})
 
     def _graph_url(self, *path_bits, **query_params):
         path_bits = list(path_bits)
@@ -59,8 +60,7 @@ class GraphClient(object):
 
     def graph_call(self, *path_bits, **kwargs):
         url = self._graph_url(*path_bits, **kwargs)
-        headers = {'Accept-encoding': 'gzip'}
-        response = requests.get(url, headers=headers)
+        response = self.session.get(url)
         return json.loads(response.content)['data']
 
 
