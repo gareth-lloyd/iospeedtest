@@ -1,8 +1,8 @@
-import argparse, json, eventlet
+import argparse, json, eventlet, gzip
 from eventlet.green import urllib2
 from urllib import urlencode
+from StringIO import StringIO
 
-import socket
 from pymongo import Connection
 
 MONGO_HOST, MONGO_PORT, MONGO_DBNAME = 'localhost', 27017, 'iotest'
@@ -48,6 +48,7 @@ class GraphClient(object):
 
     def __init__(self, token):
         self.token = token
+        self.opener = urllib2.build_opener()
 
     def _graph_url(self, *path_bits, **query_params):
         path_bits = list(path_bits)
@@ -57,9 +58,17 @@ class GraphClient(object):
 
     def graph_call(self, *path_bits, **kwargs):
         url = self._graph_url(*path_bits, **kwargs)
-        resp = urllib2.urlopen(url, timeout=30)
 
-        return json.loads(resp.read())['data']
+        request = urllib2.Request(url)
+        request.add_header('Accept-encoding', 'gzip')
+        resp = self.opener.open(request)
+
+        if 'gzip' == resp.headers.get('Content-Encoding'):
+            response_data = gzip.GzipFile(fileobj=StringIO(resp.read())).read()
+        else:
+            response_data = resp.read()
+
+        return json.loads(response_data)['data']
 
 
 class PollingTask(object):
