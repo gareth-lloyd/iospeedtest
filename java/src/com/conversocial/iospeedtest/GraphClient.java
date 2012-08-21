@@ -101,7 +101,6 @@ public class GraphClient {
 			while (!die.get()) {
 				try {
 					final Task task = queue.poll(100, TimeUnit.MILLISECONDS);
-					System.out.println(queue.size() + "," + requestCounter.get());
 					
 					if (task == null) {
 						continue;
