@@ -15,20 +15,19 @@ import java.util.zip.GZIPInputStream;
 
 import javax.management.RuntimeErrorException;
 
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
+
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.concurrent.FutureCallback;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 
 public class PollingTask {
 	private String sourceId;
 	private GraphClient graphClient;
-	private JSONParser jsonParser = new JSONParser();
 	private Map<String, String> EMPTY_PARAMS = new HashMap<String, String>();
 	
 	public PollingTask(String sourceId, GraphClient graphClient) {
@@ -68,16 +67,8 @@ public class PollingTask {
 				throw new RuntimeException(e);
 			}
 			
-			JSONObject responseObject = null;
-			try {
-				responseObject = (JSONObject) jsonParser.parse(reader);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			} catch (ParseException e) {
-				throw new RuntimeException(e);
-			} catch (NoSuchElementException e) {
-				throw new RuntimeException(e);
-			} 
+			
+			JSONObject responseObject = (JSONObject) JSONValue.parse(reader);
 			
 			if (responseObject.containsKey("error")) {
 				throw new RuntimeException("Facebook error");
@@ -120,9 +111,6 @@ public class PollingTask {
 		
 		@Override
 		public void completed(HttpResponse response) {
-			System.out.println("comments callback");
-			if (true) return;
-			
 			JSONObject responseObject = getJsonResponse(response);
 			JSONArray commentsJson = (JSONArray) responseObject.get("data");
 			
