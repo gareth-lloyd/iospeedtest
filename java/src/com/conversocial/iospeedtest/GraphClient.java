@@ -34,11 +34,11 @@ public class GraphClient {
 	private String token;
 	public final String HOST = "https://graph.facebook.com";
 	
-	public GraphClient(String token, int maxPerRoute) throws IOReactorException {
+	public GraphClient(String token, int maxPerRoute, int ioThreads) throws IOReactorException {
 		this.token = token;
 		
 		IOReactorConfig config = new IOReactorConfig();
-		config.setIoThreadCount(1);
+		config.setIoThreadCount(ioThreads);
 		config.setShutdownGracePeriod(3000);
 		config.setConnectTimeout(1000);
 		config.setSoTimeout(1000);
