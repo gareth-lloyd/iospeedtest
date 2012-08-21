@@ -15,14 +15,13 @@ import java.util.zip.GZIPInputStream;
 
 import javax.management.RuntimeErrorException;
 
-import net.minidev.json.JSONArray;
-import net.minidev.json.JSONObject;
-import net.minidev.json.JSONValue;
-
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.concurrent.FutureCallback;
+import net.minidev.json.JSONArray;
+import net.minidev.json.JSONObject;
+import net.minidev.json.JSONValue;
 
 
 public class PollingTask {
@@ -67,8 +66,8 @@ public class PollingTask {
 				throw new RuntimeException(e);
 			}
 			
-			
-			JSONObject responseObject = (JSONObject) JSONValue.parse(reader);
+			JSONObject responseObject = null;
+			responseObject = (JSONObject) JSONValue.parse(reader);
 			
 			if (responseObject.containsKey("error")) {
 				throw new RuntimeException("Facebook error");
