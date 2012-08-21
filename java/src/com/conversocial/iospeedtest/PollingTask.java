@@ -120,6 +120,8 @@ public class PollingTask {
 		
 		@Override
 		public void completed(HttpResponse response) {
+			System.out.println("comments callback");
+			if (true) return;
 			
 			JSONObject responseObject = getJsonResponse(response);
 			JSONArray commentsJson = (JSONArray) responseObject.get("data");
