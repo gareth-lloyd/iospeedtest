@@ -34,7 +34,7 @@ public class GraphClient {
 	private String token;
 	public final String HOST = "https://graph.facebook.com";
 	
-	public GraphClient(String token) throws IOReactorException {
+	public GraphClient(String token, int maxPerRoute) throws IOReactorException {
 		this.token = token;
 		
 		IOReactorConfig config = new IOReactorConfig();
@@ -46,7 +46,7 @@ public class GraphClient {
 		
 		manager = new PoolingClientAsyncConnectionManager(reactor);
 		manager.setMaxTotal(200);
-		manager.setDefaultMaxPerRoute(200);
+		manager.setDefaultMaxPerRoute(maxPerRoute);
 		
 		
 		this.httpclient = new DefaultHttpAsyncClient(manager);

@@ -24,11 +24,13 @@ public class SpeedTest {
 		String token = args[0];
 		Set<String> sourceIds = getSourceIds("../files/source_ids.txt");
 		
+		int maxPerRoute = Integer.parseInt(args[1]);
+		
 		long start = System.currentTimeMillis();
 		
 		GraphClient graphClient = null;
 		
-		graphClient = new GraphClient(token);			
+		graphClient = new GraphClient(token, maxPerRoute);			
 		for (String sourceId : sourceIds) {
 			new PollingTask(sourceId, graphClient).performTask();
 		}
